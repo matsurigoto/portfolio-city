@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="150" height="180" viewBox="0 0 150 180">
+  <defs>
+    <linearGradient id="towerYt" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ef5350"/>
+      <stop offset="100%" stop-color="#b71c1c"/>
+    </linearGradient>
+  </defs>
+  <ellipse cx="75" cy="170" rx="50" ry="9" fill="#000" opacity="0.18"/>
+  <!-- base building -->
+  <rect x="35" y="90" width="80" height="80" rx="6" fill="url(#towerYt)"/>
+  <!-- screen panel -->
+  <rect x="48" y="100" width="54" height="36" rx="4" fill="#1a1a1a"/>
+  <polygon points="68,110 68,126 82,118" fill="#ffffff"/>
+  <!-- antenna tower -->
+  <rect x="70" y="20" width="10" height="72" fill="#424242"/>
+  <circle cx="75" cy="20" r="9" fill="#ff8a65"/>
+  <!-- broadcast rings -->
+  <path d="M60 20 a15 15 0 0 1 30 0" stroke="#ffccbc" stroke-width="3" fill="none" opacity="0.8"/>
+  <path d="M52 20 a23 23 0 0 1 46 0" stroke="#ffccbc" stroke-width="3" fill="none" opacity="0.5"/>
+  <!-- side windows -->
+  <rect x="40" y="148" width="14" height="14" rx="2" fill="#ffebee" opacity="0.9"/>
+  <rect x="96" y="148" width="14" height="14" rx="2" fill="#ffebee" opacity="0.9"/>
+</svg>

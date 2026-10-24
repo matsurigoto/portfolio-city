@@ -1,14 +1,14 @@
 // Portfolio City - Phaser.js skeleton
-// 以色塊代表建築，之後可替換成正式美術素材 (PNG/Spine)
+// 使用手繪 SVG 等角建築美術素材 (assets/) 取代色塊佔位
 
-const CATEGORY_STYLE = {
-  blog: { color: 0x795548, label: "📰", baseW: 60, baseH: 60 },
-  youtube: { color: 0xe53935, label: "🎬", baseW: 70, baseH: 90 },
-  speech: { color: 0xfb8c00, label: "🎤", baseW: 80, baseH: 70 },
-  book: { color: 0x8e24aa, label: "📚", baseW: 70, baseH: 100 },
+const CATEGORY_ASSET = {
+  blog: { key: "building-blog", label: "📰", baseScale: 0.55 },
+  youtube: { key: "building-youtube", label: "🎬", baseScale: 0.5 },
+  speech: { key: "building-speech", label: "🎤", baseScale: 0.5 },
+  book: { key: "building-book", label: "📚", baseScale: 0.5 },
 };
 
-// 依數值級距決定建築大小等級 (0~2)，可依需求調整門檻
+// 依數值級距決定建築等級 (0~2)，可依需求調整門檻
 function getLevel(item) {
   const metricValue = Object.values(item.metric || {})[0] || 0;
   if (metricValue >= 20000) return 2;
@@ -23,6 +23,14 @@ class CityScene extends Phaser.Scene {
 
   preload() {
     this.load.json("content", "content.json");
+
+    // 建築美術素材 (SVG，向量縮放不失真)
+    this.load.svg("building-blog", "assets/building-blog.svg", { width: 140, height: 150 });
+    this.load.svg("building-youtube", "assets/building-youtube.svg", { width: 150, height: 180 });
+    this.load.svg("building-speech", "assets/building-speech.svg", { width: 160, height: 150 });
+    this.load.svg("building-book", "assets/building-book.svg", { width: 150, height: 190 });
+    this.load.svg("island-base", "assets/island-base.svg", { width: 260, height: 140 });
+    this.load.svg("star-badge", "assets/star-badge.svg", { width: 24, height: 24 });
   }
 
   create() {
@@ -52,10 +60,11 @@ class CityScene extends Phaser.Scene {
 
   drawDistricts() {
     this.districts.forEach((d) => {
-      // 島嶼基座
-      const g = this.add.graphics();
-      g.fillStyle(Phaser.Display.Color.HexStringToColor(d.color).color, 1);
-      g.fillEllipse(d.x, d.y + 60, 220, 110);
+      // 島嶼基座美術圖，依分區顏色上色 (setTint)
+      const island = this.add
+        .image(d.x, d.y + 60, "island-base")
+        .setDisplaySize(260, 140);
+      island.setTint(Phaser.Display.Color.HexStringToColor(d.color).color);
 
       // 分區標題
       this.add
@@ -74,38 +83,43 @@ class CityScene extends Phaser.Scene {
     // 依分區分組，群內自動排列建築位置
     this.districts.forEach((d) => {
       const districtItems = this.items.filter((i) => i.district === d.id);
-      const spacing = 90;
+      const spacing = 110;
       const startX = d.x - ((districtItems.length - 1) * spacing) / 2;
 
       districtItems.forEach((item, idx) => {
-        const style = CATEGORY_STYLE[item.category] || CATEGORY_STYLE.blog;
+        const style = CATEGORY_ASSET[item.category] || CATEGORY_ASSET.blog;
         const level = getLevel(item);
-        const w = style.baseW + level * 15;
-        const h = style.baseH + level * 25;
+        const scale = style.baseScale + level * 0.12;
         const bx = startX + idx * spacing;
-        const by = d.y + 40 - h / 2;
+        const by = d.y + 70;
 
-        const rect = this.add
-          .rectangle(bx, by, w, h, style.color)
-          .setStrokeStyle(2, 0xffffff, 0.8)
+        const sprite = this.add
+          .image(bx, by, style.key)
+          .setOrigin(0.5, 1)
+          .setScale(scale)
           .setInteractive({ useHandCursor: true });
 
-        this.add
-          .text(bx, by, style.label, { fontSize: "24px" })
-          .setOrigin(0.5);
+        // 等級星星徽章 (0~2顆)
+        for (let s = 0; s <= level; s++) {
+          this.add
+            .image(bx - level * 8 + s * 16, by - sprite.displayHeight - 10, "star-badge")
+            .setScale(0.7);
+        }
 
         this.add
-          .text(bx, by + h / 2 + 12, item.title, {
+          .text(bx, by + 10, item.title, {
             fontSize: "11px",
             color: "#ffffff",
-            wordWrap: { width: w + 20 },
+            backgroundColor: "#00000066",
+            padding: { x: 4, y: 2 },
+            wordWrap: { width: 110 },
             align: "center",
           })
           .setOrigin(0.5, 0);
 
-        rect.on("pointerover", () => rect.setFillStyle(style.color, 0.7));
-        rect.on("pointerout", () => rect.setFillStyle(style.color, 1));
-        rect.on("pointerdown", () => this.showPanel(item));
+        sprite.on("pointerover", () => sprite.setTint(0xcccccc));
+        sprite.on("pointerout", () => sprite.clearTint());
+        sprite.on("pointerdown", () => this.showPanel(item));
       });
     });
   }
