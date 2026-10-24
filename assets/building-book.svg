@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="150" height="190" viewBox="0 0 150 190">
+  <defs>
+    <linearGradient id="libWall" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ba68c8"/>
+      <stop offset="100%" stop-color="#6a1b9a"/>
+    </linearGradient>
+  </defs>
+  <ellipse cx="75" cy="180" rx="55" ry="9" fill="#000" opacity="0.18"/>
+  <!-- steps -->
+  <rect x="25" y="160" width="100" height="10" rx="2" fill="#4a148c"/>
+  <rect x="32" y="150" width="86" height="10" rx="2" fill="#5e158e"/>
+  <!-- main body -->
+  <rect x="35" y="80" width="80" height="70" fill="url(#libWall)"/>
+  <!-- pediment / roof -->
+  <polygon points="25,80 75,35 125,80" fill="#8e24aa"/>
+  <!-- columns -->
+  <rect x="42" y="88" width="8" height="58" fill="#f3e5f5"/>
+  <rect x="60" y="88" width="8" height="58" fill="#f3e5f5"/>
+  <rect x="82" y="88" width="8" height="58" fill="#f3e5f5"/>
+  <rect x="100" y="88" width="8" height="58" fill="#f3e5f5"/>
+  <!-- door -->
+  <rect x="66" y="118" width="18" height="28" rx="2" fill="#311b92"/>
+  <!-- emblem: open book on pediment -->
+  <g transform="translate(66,52)">
+    <path d="M0 0 L9 -4 L18 0 L18 10 L9 6 L0 10 Z" fill="#fff59d"/>
+  </g>
+</svg>
