@@ -1,0 +1,84 @@
+{
+  "districts": [
+    {
+      "id": "creative",
+      "name": "創作島",
+      "x": 150,
+      "y": 400,
+      "color": "#8bc34a"
+    },
+    {
+      "id": "media",
+      "name": "影音島",
+      "x": 450,
+      "y": 400,
+      "color": "#03a9f4"
+    },
+    {
+      "id": "stage",
+      "name": "講台島",
+      "x": 750,
+      "y": 400,
+      "color": "#ff9800"
+    },
+    {
+      "id": "books",
+      "name": "著作島",
+      "x": 1050,
+      "y": 400,
+      "color": "#9c27b0"
+    }
+  ],
+  "items": [
+    {
+      "id": "blog-001",
+      "district": "creative",
+      "category": "blog",
+      "title": "如何開始記帳",
+      "date": "2023-01-10",
+      "metric": { "views": 5200 },
+      "link": "https://example.com/post1",
+      "description": "從零開始建立記帳習慣的實用指南。"
+    },
+    {
+      "id": "blog-002",
+      "district": "creative",
+      "category": "blog",
+      "title": "理財小白的第一堂課",
+      "date": "2023-06-20",
+      "metric": { "views": 12000 },
+      "link": "https://example.com/post2",
+      "description": "給新手的基礎理財觀念整理。"
+    },
+    {
+      "id": "yt-001",
+      "district": "media",
+      "category": "youtube",
+      "title": "五分鐘搞懂複利",
+      "date": "2023-03-15",
+      "metric": { "views": 30000 },
+      "link": "https://youtube.com/watch?v=xxx",
+      "description": "用生活化例子解釋複利效果。"
+    },
+    {
+      "id": "talk-001",
+      "district": "stage",
+      "category": "speech",
+      "title": "企業內訓：理財素養工作坊",
+      "date": "2024-02-01",
+      "metric": { "attendees": 80 },
+      "link": "",
+      "description": "為企業員工舉辦的理財素養培訓課程。"
+    },
+    {
+      "id": "book-001",
+      "district": "books",
+      "category": "book",
+      "title": "打造你的財富地圖",
+      "date": "2024-05-01",
+      "metric": { "copiesSold": 3000 },
+      "link": "https://example.com/book1",
+      "description": "第一本著作，談如何建立個人財富系統。"
+    }
+  ]
+}
