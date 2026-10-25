@@ -150,6 +150,28 @@ export function createGulls(count, centers) {
   };
 }
 
+// 對話氣泡:以 Canvas 繪製成 Sprite,掛在人物頭上
+export function makeBubble(text) {
+  const c = document.createElement("canvas");
+  c.width = 512; c.height = 160;
+  const g = c.getContext("2d");
+  g.fillStyle = "#fff";
+  g.strokeStyle = "#455a64";
+  g.lineWidth = 6;
+  g.beginPath();
+  g.roundRect(8, 8, 496, 108, 28);
+  g.moveTo(236, 116); g.lineTo(256, 152); g.lineTo(276, 116);
+  g.fill(); g.stroke();
+  g.fillStyle = "#263238";
+  g.font = "bold 34px 'Microsoft JhengHei', sans-serif";
+  g.textAlign = "center"; g.textBaseline = "middle";
+  g.fillText(text.length > 16 ? text.slice(0, 15) + "…" : text, 256, 62);
+  const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(c), depthTest: false, transparent: true }));
+  sp.scale.set(3.6, 1.125, 1);
+  sp.renderOrder = 10;
+  return sp;
+}
+
 const SKIN = [0xf1c27d, 0xe0ac69, 0xc68642, 0x8d5524];
 const SHIRT = [0xe53935, 0x1e88e5, 0x43a047, 0xfdd835, 0x8e24aa, 0xfb8c00, 0x00acc1];
 
@@ -190,17 +212,26 @@ export function createWalkers(path, groundY, count, scale = 1) {
   const walkers = Array.from({ length: count }, (_, i) => ({
     mesh: makePerson(SHIRT[i % SHIRT.length], SKIN[i % SKIN.length], i % 3 ? 0x3e2723 : 0xffd54f),
     speed: 0.9 + (i % 4) * 0.18,
-    offset: (total * 2 * i) / count + i * 3,
+    dist: (total * 2 * i) / count + i * 3,
     lane: ((i % 3) - 1) * 0.28,
     heading: 0,
+    pausedUntil: 0,
   }));
-  walkers.forEach((w) => w.mesh.scale.setScalar(scale));
+  walkers.forEach((w) => {
+    w.mesh.scale.setScalar(scale);
+    w.mesh.userData.walker = w;
+  });
 
+  let last = 0;
   return {
     meshes: walkers.map((w) => w.mesh),
     update(t) {
+      const dt = Math.min(t - last, 0.1);
+      last = t;
       walkers.forEach((w) => {
-        const d = (t * w.speed + w.offset) % (total * 2);
+        const paused = t < w.pausedUntil;
+        if (!paused) w.dist += dt * w.speed;
+        const d = w.dist % (total * 2);
         const forward = d < total;
         const s = forward ? d : total * 2 - d;
         const seg = segs.find((sg) => s <= sg.start + sg.len) || segs[segs.length - 1];
@@ -215,15 +246,15 @@ export function createWalkers(path, groundY, count, scale = 1) {
         diff = Math.atan2(Math.sin(diff), Math.cos(diff));
         w.heading += diff * 0.12;
 
-        const phase = t * w.speed * 5 + w.offset;
-        const swing = Math.sin(phase) * 0.7;
+        const phase = w.dist * 5.5;
+        const swing = paused ? 0 : Math.sin(phase) * 0.7;
         const L = w.mesh.userData.limbs;
         L.legL.rotation.x = swing;
         L.legR.rotation.x = -swing;
         L.armL.rotation.x = -swing * 0.8;
         L.armR.rotation.x = swing * 0.8;
 
-        w.mesh.position.set(x, groundY(x, z, t) + Math.abs(Math.sin(phase)) * 0.04, z);
+        w.mesh.position.set(x, groundY(x, z, t) + (paused ? 0 : Math.abs(Math.sin(phase)) * 0.04), z);
         w.mesh.rotation.y = w.heading;
       });
     },

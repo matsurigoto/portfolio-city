@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { createSea, waveHeight } from "./ocean3d.js";
-import { makeDock, makeBridge, makeBoat, createBoats, createGulls, createWalkers } from "./props3d.js";
+import { makeDock, makeBridge, makeBoat, createBoats, createGulls, createWalkers, makeBubble } from "./props3d.js";
 
 const data = await (await fetch("content.json")).json();
 
@@ -339,17 +339,38 @@ let downPos = null;
 function pick(e) {
   mouse.set((e.clientX / innerWidth) * 2 - 1, -(e.clientY / innerHeight) * 2 + 1);
   ray.setFromCamera(mouse, camera);
-  const hit = ray.intersectObjects(clickable, true)[0];
+  const hit = ray.intersectObjects([...clickable, ...walkers.meshes], true)[0];
   if (!hit) return null;
   let o = hit.object;
-  while (o && !o.userData.item) o = o.parent;
+  while (o && !o.userData.item && !o.userData.walker) o = o.parent;
   return o;
+}
+
+const GREETINGS = [
+  "今天天氣真好~",
+  "這座城市又長大了!",
+  "要不要去逛逛?",
+  "歡迎來到履歷城市!",
+  "我正要去看展覽~",
+];
+
+function talk(person, t) {
+  const old = person.getObjectByName("bubble");
+  if (old) person.remove(old);
+  const titles = data.items.map((i) => i.title);
+  const lines = [...GREETINGS, ...titles.map((s) => `推薦看看《${s}》!`)];
+  const bubble = makeBubble(lines[Math.floor(Math.random() * lines.length)]);
+  bubble.name = "bubble";
+  bubble.position.set(0, 1.9, 0);
+  person.add(bubble);
+  person.userData.walker.pausedUntil = t + 3.5;
+  person.userData.bubbleUntil = t + 3.5;
 }
 
 addEventListener("pointermove", (e) => {
   hovered = pick(e);
   document.body.style.cursor = hovered ? "pointer" : "default";
-  if (hovered) {
+  if (hovered && hovered.userData.item) {
     tip.style.display = "block";
     tip.style.left = e.clientX + 12 + "px";
     tip.style.top = e.clientY + 12 + "px";
@@ -360,7 +381,9 @@ addEventListener("pointerdown", (e) => (downPos = [e.clientX, e.clientY]));
 addEventListener("pointerup", (e) => {
   if (!downPos || Math.hypot(e.clientX - downPos[0], e.clientY - downPos[1]) > 5) return;
   const obj = pick(e);
-  if (obj) showPanel(obj.userData.item);
+  if (!obj) return;
+  if (obj.userData.item) showPanel(obj.userData.item);
+  else talk(obj, clock.getElapsedTime());
 });
 
 function showPanel(item) {
@@ -390,6 +413,10 @@ renderer.setAnimationLoop(() => {
   boats.update(t);
   gulls.update(t);
   walkers.update(t);
+  walkers.meshes.forEach((p) => {
+    const b = p.getObjectByName("bubble");
+    if (b && t > p.userData.bubbleUntil) p.remove(b);
+  });
   bobbers.forEach((b) => {
     const p = b.userData.base;
     b.position.set(p.x, waveHeight(p.x, p.z, t) - 0.2, p.z);
