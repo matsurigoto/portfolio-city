@@ -31,30 +31,6 @@
   ],
   "items": [
     {
-      "id": "talk-001",
-      "district": "stage",
-      "category": "speech",
-      "title": "企業內訓：理財素養工作坊",
-      "date": "2024-02-01",
-      "metric": {
-        "attendees": 80
-      },
-      "link": "",
-      "description": "為企業員工舉辦的理財素養培訓課程。"
-    },
-    {
-      "id": "book-001",
-      "district": "books",
-      "category": "book",
-      "title": "打造你的財富地圖",
-      "date": "2024-05-01",
-      "metric": {
-        "copiesSold": 3000
-      },
-      "link": "https://example.com/book1",
-      "description": "第一本著作，談如何建立個人財富系統。"
-    },
-    {
       "id": "blog-note-001",
       "district": "creative",
       "category": "blog",
