@@ -3,6 +3,7 @@ import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { createSea, waveHeight } from "./ocean3d.js";
 import { makeDock, makeBridge, makeBoat, createBoats, createGulls, createWalkers, makeBubble } from "./props3d.js";
+import { makeLandmark } from "./landmarks3d.js";
 
 const data = await (await fetch("content.json")).json();
 
@@ -76,9 +77,51 @@ function makeBuilding(name, footprint) {
   return wrap;
 }
 
+// 達到此等級即以特製地標取代一般建築(部落格需 Lv.2,其餘 Lv.1)
+const LANDMARK_LEVEL = { blog: 2, youtube: 1, speech: 1, book: 1 };
+const VARIETY = ["building-a", "building-c", "building-d", "building-f", "building-h", "building-i"];
+
+// 一般建築依項目 id 雜湊挑選外觀,避免整排房子一模一樣
+function pickModel(style, item, level) {
+  if (level > 0) return style.models[level];
+  let h = 0;
+  for (const ch of item.id) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+  return item.category === "blog" ? VARIETY[h % VARIETY.length] : style.models[0];
+}
+
 function getLevel(item) {
+  if (item.level !== undefined) return item.level;
   const v = Object.values(item.metric || {})[0] || 0;
   return v >= 20000 ? 2 : v >= 5000 ? 1 : 0;
+}
+
+// 同一區同類別作品太多時,依年份合併成一幢地標建築,點擊後在面板列出該年全部作品
+const GROUP_THRESHOLD = 24;
+const CATEGORY_LABEL = { blog: "文章", youtube: "影片", speech: "演講", book: "著作" };
+const allItems = data.items;
+{
+  const grouped = [];
+  data.districts.forEach((d) => {
+    const items = allItems.filter((it) => it.district === d.id);
+    if (items.length <= GROUP_THRESHOLD) return grouped.push(...items);
+    const byKey = new Map();
+    items.forEach((it) => {
+      const key = `${it.category}|${it.date.slice(0, 4)}`;
+      if (!byKey.has(key)) byKey.set(key, []);
+      byKey.get(key).push(it);
+    });
+    [...byKey.entries()].sort(([a], [b]) => a.split("|")[1].localeCompare(b.split("|")[1])).forEach(([key, list]) => {
+      const [category, year] = key.split("|");
+      list.sort((a, b) => b.date.localeCompare(a.date));
+      grouped.push({
+        id: `group-${d.id}-${key}`, district: d.id, category, date: year,
+        title: `${year} 年${CATEGORY_LABEL[category] || "作品"}`,
+        description: `共 ${list.length} 篇`, children: list,
+        level: list.length >= 50 ? 2 : list.length >= 20 ? 1 : 0,
+      });
+    });
+  });
+  data.items = grouped;
 }
 
 // 固定種子的亂數,讓每次載入裝飾位置一致
@@ -417,7 +460,8 @@ layouts.forEach((L, i) => {
   L.cells.forEach(({ item, bx, bz }) => {
     const style = CATEGORY[item.category] || CATEGORY.blog;
     const level = getLevel(item);
-    const b = makeBuilding(style.models[level], style.footprint);
+    const lm = level >= (LANDMARK_LEVEL[item.category] ?? 2) ? makeLandmark(item.category, style.footprint * 1.25) : null;
+    const b = lm || makeBuilding(pickModel(style, item, level), style.footprint);
     b.position.set(bx, 0.7, bz);
     b.userData.item = item;
 
@@ -546,7 +590,7 @@ const GREETINGS = [
 function talk(person, t) {
   const old = person.getObjectByName("bubble");
   if (old) person.remove(old);
-  const titles = data.items.map((i) => i.title);
+  const titles = allItems.map((i) => i.title);
   const lines = [...GREETINGS, ...titles.map((s) => `推薦看看《${s}》!`)];
   const bubble = makeBubble(lines[Math.floor(Math.random() * lines.length)]);
   bubble.name = "bubble";
@@ -578,8 +622,22 @@ addEventListener("pointerup", (e) => {
 function showPanel(item) {
   document.getElementById("panel-title").innerText = item.title;
   const m = Object.entries(item.metric || {}).map(([k, v]) => `${k}: ${v.toLocaleString()}`).join(" ・ ");
-  document.getElementById("panel-meta").innerText = `${item.date} ・ ${m}`;
+  document.getElementById("panel-meta").innerText = [item.date, m].filter(Boolean).join(" ・ ");
   document.getElementById("panel-desc").innerText = item.description || "";
+  const list = document.getElementById("panel-list");
+  list.replaceChildren(...(item.children || []).map((c) => {
+    const li = document.createElement("li");
+    const d = document.createElement("span");
+    d.className = "d";
+    d.textContent = c.date.slice(5);
+    const a = document.createElement("a");
+    a.textContent = c.title;
+    a.target = "_blank";
+    a.rel = "noopener";
+    if (c.link) a.href = c.link;
+    li.append(d, a);
+    return li;
+  }));
   const a = document.getElementById("panel-link");
   a.style.display = item.link ? "inline-block" : "none";
   if (item.link) a.href = item.link;
