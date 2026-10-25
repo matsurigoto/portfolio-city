@@ -46,16 +46,82 @@ class CityScene extends Phaser.Scene {
   }
 
   drawOcean() {
-    const g = this.add.graphics();
-    g.fillStyle(0x0d47a1, 1);
-    g.fillRect(0, 350, 1300, 300);
-    // 簡單波浪紋裝飾
-    for (let x = 0; x < 1300; x += 40) {
-      g.lineStyle(2, 0x1565c0, 0.6);
-      g.beginPath();
-      g.arc(x, 380, 15, Math.PI, 0, false);
-      g.strokePath();
+    const W = 2000;
+    const H = this.scale.height;
+    const horizon = 330;
+
+    // 天空漸層
+    const sky = this.add.graphics().setScrollFactor(0);
+    sky.fillGradientStyle(0x1b3a6b, 0x1b3a6b, 0xffb98a, 0xffb98a, 1);
+    sky.fillRect(0, 0, this.scale.width, horizon + 20);
+
+    // 太陽光暈
+    const sun = this.add.graphics().setScrollFactor(0.1);
+    [90, 65, 45].forEach((r, i) => {
+      sun.fillStyle(0xfff3b0, 0.15 + i * 0.25);
+      sun.fillCircle(this.scale.width * 0.8, horizon - 40, r);
+    });
+
+    // 雲朵緩慢飄動
+    for (let i = 0; i < 6; i++) {
+      const cx = Phaser.Math.Between(0, this.scale.width);
+      const cy = Phaser.Math.Between(40, horizon - 80);
+      const cloud = this.add.graphics().setScrollFactor(0.2).setAlpha(0.55);
+      cloud.fillStyle(0xffffff, 1);
+      cloud.fillEllipse(0, 0, 120, 30);
+      cloud.fillEllipse(-30, -10, 60, 28);
+      cloud.fillEllipse(25, -12, 70, 30);
+      cloud.setPosition(cx, cy);
+      this.tweens.add({
+        targets: cloud,
+        x: cx + Phaser.Math.Between(150, 300),
+        duration: Phaser.Math.Between(20000, 40000),
+        yoyo: true,
+        repeat: -1,
+        ease: "Sine.easeInOut",
+      });
     }
+
+    // 海洋漸層
+    const sea = this.add.graphics();
+    sea.fillGradientStyle(0x4fc3f7, 0x4fc3f7, 0x0d47a1, 0x0d47a1, 1);
+    sea.fillRect(-W / 2, horizon, W * 2, H);
+
+    // 動態波浪紋
+    for (let row = 0; row < 5; row++) {
+      for (let x = -400; x < 1700; x += 60) {
+        const y = horizon + 25 + row * 45 + (x % 120 === 0 ? 0 : 12);
+        const wave = this.add.graphics();
+        wave.lineStyle(2, 0xffffff, 0.25 - row * 0.03);
+        wave.beginPath();
+        wave.arc(0, 0, 14, Math.PI, 0, false);
+        wave.strokePath();
+        wave.setPosition(x, y);
+        this.tweens.add({
+          targets: wave,
+          y: y + 5,
+          alpha: 0.3,
+          duration: 1500 + Math.random() * 1500,
+          yoyo: true,
+          repeat: -1,
+          ease: "Sine.easeInOut",
+          delay: Math.random() * 1500,
+        });
+      }
+    }
+
+    // 標題
+    this.add
+      .text(this.scale.width / 2, 36, "🏙️ 個人履歷城市", {
+        fontSize: "32px",
+        fontStyle: "bold",
+        color: "#ffffff",
+        stroke: "#1b3a6b",
+        strokeThickness: 5,
+      })
+      .setOrigin(0.5)
+      .setScrollFactor(0)
+      .setDepth(50);
   }
 
   drawDistricts() {
@@ -65,6 +131,14 @@ class CityScene extends Phaser.Scene {
         .image(d.x, d.y + 60, "island-base")
         .setDisplaySize(260, 140);
       island.setTint(Phaser.Display.Color.HexStringToColor(d.color).color);
+      this.tweens.add({
+        targets: island,
+        y: island.y + 4,
+        duration: 2200 + Math.random() * 800,
+        yoyo: true,
+        repeat: -1,
+        ease: "Sine.easeInOut",
+      });
 
       // 分區標題
       this.add
@@ -93,6 +167,9 @@ class CityScene extends Phaser.Scene {
         const bx = startX + idx * spacing;
         const by = d.y + 70;
 
+        // 建築陰影
+        this.add.ellipse(bx, by - 2, 90 * scale * 1.6, 18, 0x000000, 0.3);
+
         const sprite = this.add
           .image(bx, by, style.key)
           .setOrigin(0.5, 1)
@@ -117,8 +194,14 @@ class CityScene extends Phaser.Scene {
           })
           .setOrigin(0.5, 0);
 
-        sprite.on("pointerover", () => sprite.setTint(0xcccccc));
-        sprite.on("pointerout", () => sprite.clearTint());
+        sprite.on("pointerover", () => {
+          sprite.setTint(0xeeeeee);
+          this.tweens.add({ targets: sprite, scale: scale * 1.1, duration: 120 });
+        });
+        sprite.on("pointerout", () => {
+          sprite.clearTint();
+          this.tweens.add({ targets: sprite, scale, duration: 120 });
+        });
         sprite.on("pointerdown", () => this.showPanel(item));
       });
     });

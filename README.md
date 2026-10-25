@@ -16,11 +16,16 @@
 
 ```
 portfolio-city/
-├── index.html          # 進入頁面，載入 Phaser 與遊戲面板 UI
+├── index.html          # 預設首頁：3D 版 (Three.js)
+├── city2d.html         # 2D 版 (Phaser)，網址 /city2d.html
 ├── content.json         # 資料模型：分區 (districts) 與內容項目 (items)
 ├── src/
-│   └── main.js           # Phaser 場景邏輯：繪製島嶼、放置建築、互動面板
-├── assets/               # 建築 / 地圖美術素材 (SVG，原創手繪，可自由替換)
+│   ├── main3d.js         # 3D 場景：島嶼、Kenney 建築模型、植物裝飾、互動面板
+│   ├── ocean3d.js        # 水面 shader 與波浪公式
+│   ├── props3d.js        # 碼頭、橋梁、小船、海鷗
+│   └── main.js           # 2D 版 Phaser 場景邏輯
+├── assets/               # 2D 美術素材 (SVG，原創手繪，可自由替換)
+│   ├── models/kenney-city/   # 3D 建築模型 (Kenney City Kit, CC0)
 │   ├── building-blog.svg     # 部落格 → 小屋
 │   ├── building-youtube.svg  # YouTube → 電視塔
 │   ├── building-speech.svg   # 演講 → 露天劇場
@@ -47,7 +52,7 @@ npm start       # 啟動本機伺服器 (http://localhost:5173)
 npm run dev
 ```
 
-> 若無法使用 npm，也可以用任何靜態伺服器（例如 VS Code 的 Live Server 擴充套件）直接開啟 `index.html`，但需自行確保 `vendor/phaser.min.js` 存在（可從 `node_modules/phaser/dist/phaser.min.js` 手動複製）。
+> 3D 版使用 `node_modules/three`，需先執行 `npm install`。若無法使用 npm，也可以用任何靜態伺服器（例如 VS Code 的 Live Server 擴充套件）開啟；2D 版 `city2d.html` 另需 `vendor/phaser.min.js`（可從 `node_modules/phaser/dist/phaser.min.js` 手動複製）。
 
 ## ✏️ 新增你的內容
 

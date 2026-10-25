@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8" />
+<title>個人履歷城市 | Portfolio City</title>
+<style>
+  html, body { margin: 0; padding: 0; background: #1e2a38; overflow: hidden; font-family: "Microsoft JhengHei", sans-serif; }
+  #ui-panel {
+    position: fixed; top: 0; right: 0; width: 320px; height: 100%;
+    background: rgba(20, 30, 40, 0.92); color: #fff; padding: 48px 24px 20px;
+    backdrop-filter: blur(8px); box-shadow: -8px 0 24px rgba(0,0,0,0.4);
+    box-sizing: border-box; transform: translateX(100%); transition: transform 0.3s ease;
+    overflow-y: auto; z-index: 10;
+  }
+  #ui-panel.open { transform: translateX(0); }
+  #ui-panel h2 { margin-top: 0; color: #ffd54f; }
+  #ui-panel .meta { color: #9e9e9e; font-size: 13px; margin-bottom: 10px; }
+  #ui-panel a { color: #4fc3f7; }
+  #close-btn {
+    position: absolute; top: 10px; left: 10px; background: none; border: none;
+    color: #fff; font-size: 20px; cursor: pointer;
+  }
+  #hint {
+    position: fixed; bottom: 10px; left: 10px; color: #cfd8dc; font-size: 13px;
+    background: rgba(0,0,0,0.4); padding: 6px 12px; border-radius: 6px;
+  }
+</style>
+</head>
+<body>
+  <div id="game"></div>
+  <div id="ui-panel">
+    <button id="close-btn">✕</button>
+    <h2 id="panel-title"></h2>
+    <div class="meta" id="panel-meta"></div>
+    <p id="panel-desc"></p>
+    <a id="panel-link" href="#" target="_blank" style="display:none;">前往查看 →</a>
+  </div>
+  <div id="hint">🖱️ 點擊建築查看內容 ・ 拖曳畫面可平移</div>
+
+  <script src="vendor/phaser.min.js"></script>
+  <script src="src/main.js"></script>
+</body>
+</html>

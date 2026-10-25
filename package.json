@@ -9,12 +9,10 @@
     "dev": "http-server . -p 5173 -c-1 -o"
   },
   "dependencies": {
-    "phaser": "^3.70.0"
+    "phaser": "^3.70.0",
+    "three": "^0.186.1"
   },
   "devDependencies": {
     "http-server": "^14.1.1"
-  },
-  "dependencies": {
-    "phaser": "^3.70.0"
   }
 }
