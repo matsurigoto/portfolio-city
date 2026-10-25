@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { createSea, waveHeight } from "./ocean3d.js";
-import { makeDock, makeBridge, makeBoat, createBoats, createGulls } from "./props3d.js";
+import { makeDock, makeBridge, makeBoat, createBoats, createGulls, createWalkers } from "./props3d.js";
 
 const data = await (await fetch("content.json")).json();
 
@@ -169,6 +169,7 @@ function decorateIsland(group, seed, span) {
   const free = (x, z, gap) =>
     !(Math.abs(z) < 2.6 && Math.abs(x) < span + 2.2) &&
     !(Math.abs(z) < 1.8) && // 橋梁通道
+    !(Math.abs(z - 3.4) < 1 && Math.abs(x) < 6.5) && // 行人步道
     !(Math.abs(x) < 1.6 && z > 4.5) && // 碼頭入口
     placed.every(([px, pz]) => Math.hypot(px - x, pz - z) > gap);
 
@@ -303,6 +304,31 @@ boats.meshes.forEach((m) => scene.add(m));
 const gulls = createGulls(10, centers);
 gulls.meshes.forEach((m) => scene.add(m));
 
+// 行人路線:島上沿建築前方步道走,過橋到下一座島
+const WALK_Z = 3.4;
+const walkPath = [];
+centers.forEach((c, i) => {
+  walkPath.push({ x: c.x - 5.5, z: WALK_Z }, { x: c.x + 5.5, z: WALK_Z });
+  if (i < centers.length - 1) {
+    walkPath.push({ x: c.x + ISLAND_R - 1, z: 0 }, { x: centers[i + 1].x - ISLAND_R + 1, z: 0 });
+  }
+});
+
+function groundY(x, z, t) {
+  for (let i = 0; i < centers.length - 1; i++) {
+    const x0 = centers[i].x + ISLAND_R - 1, x1 = centers[i + 1].x - ISLAND_R + 1;
+    if (x > x0 && x < x1) {
+      const u = (x - x0) / (x1 - x0);
+      return 0.7 + 4 * 0.8 * u * (1 - u) + 0.05;
+    }
+  }
+  const idx = centers.reduce((best, c, i) => (Math.abs(x - c.x) < Math.abs(x - centers[best].x) ? i : best), 0);
+  return 0.75 + Math.sin(t * 0.9 + islands[idx].phase) * 0.12;
+}
+
+const walkers = createWalkers(walkPath, groundY, 10, 1.1);
+walkers.meshes.forEach((m) => scene.add(m));
+
 // 互動:hover / 點擊
 const ray = new THREE.Raycaster();
 const mouse = new THREE.Vector2();
@@ -363,6 +389,7 @@ renderer.setAnimationLoop(() => {
   sea.material.uniforms.uTime.value = t;
   boats.update(t);
   gulls.update(t);
+  walkers.update(t);
   bobbers.forEach((b) => {
     const p = b.userData.base;
     b.position.set(p.x, waveHeight(p.x, p.z, t) - 0.2, p.z);

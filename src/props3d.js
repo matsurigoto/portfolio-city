@@ -149,3 +149,84 @@ export function createGulls(count, centers) {
     },
   };
 }
+
+const SKIN = [0xf1c27d, 0xe0ac69, 0xc68642, 0x8d5524];
+const SHIRT = [0xe53935, 0x1e88e5, 0x43a047, 0xfdd835, 0x8e24aa, 0xfb8c00, 0x00acc1];
+
+// 低多邊形小人,面向 +z;腿與手臂以樞軸旋轉做走路擺動
+export function makePerson(shirt, skin, hair) {
+  const g = new THREE.Group();
+  const limb = (w, h, d, m, x, y) => {
+    const pivot = new THREE.Group();
+    pivot.position.set(x, y, 0);
+    pivot.add(part(new THREE.BoxGeometry(w, h, d), m, 0, -h / 2, 0));
+    return pivot;
+  };
+  const shirtM = std(shirt), skinM = std(skin), pantsM = std(0x37474f), hairM = std(hair);
+  g.add(part(new THREE.BoxGeometry(0.36, 0.42, 0.2), shirtM, 0, 0.66, 0));
+  const head = part(new THREE.IcosahedronGeometry(0.17, 0), skinM, 0, 1.08, 0);
+  g.add(head);
+  g.add(part(new THREE.SphereGeometry(0.18, 6, 4, 0, Math.PI * 2, 0, Math.PI / 2), hairM, 0, 1.1, -0.01));
+  const legL = limb(0.14, 0.45, 0.16, pantsM, -0.1, 0.45);
+  const legR = limb(0.14, 0.45, 0.16, pantsM, 0.1, 0.45);
+  const armL = limb(0.1, 0.4, 0.12, skinM, -0.25, 0.85);
+  const armR = limb(0.1, 0.4, 0.12, skinM, 0.25, 0.85);
+  g.add(legL, legR, armL, armR);
+  g.userData.limbs = { legL, legR, armL, armR };
+  return g;
+}
+
+// 行人沿著折線路徑來回行走。groundY(x, z, t) 回傳該處地面高度(含橋面拱起與島嶼起伏)
+export function createWalkers(path, groundY, count, scale = 1) {
+  const segs = [];
+  let total = 0;
+  for (let i = 0; i < path.length - 1; i++) {
+    const dx = path[i + 1].x - path[i].x, dz = path[i + 1].z - path[i].z;
+    const len = Math.hypot(dx, dz);
+    segs.push({ from: path[i], dx: dx / len, dz: dz / len, len, start: total });
+    total += len;
+  }
+
+  const walkers = Array.from({ length: count }, (_, i) => ({
+    mesh: makePerson(SHIRT[i % SHIRT.length], SKIN[i % SKIN.length], i % 3 ? 0x3e2723 : 0xffd54f),
+    speed: 0.9 + (i % 4) * 0.18,
+    offset: (total * 2 * i) / count + i * 3,
+    lane: ((i % 3) - 1) * 0.28,
+    heading: 0,
+  }));
+  walkers.forEach((w) => w.mesh.scale.setScalar(scale));
+
+  return {
+    meshes: walkers.map((w) => w.mesh),
+    update(t) {
+      walkers.forEach((w) => {
+        const d = (t * w.speed + w.offset) % (total * 2);
+        const forward = d < total;
+        const s = forward ? d : total * 2 - d;
+        const seg = segs.find((sg) => s <= sg.start + sg.len) || segs[segs.length - 1];
+        const u = s - seg.start;
+        // 以路徑法線方向偏移,避免多人重疊
+        const x = seg.from.x + seg.dx * u - seg.dz * w.lane;
+        const z = seg.from.z + seg.dz * u + seg.dx * w.lane;
+        const sign = forward ? 1 : -1;
+
+        const target = Math.atan2(seg.dx * sign, seg.dz * sign);
+        let diff = target - w.heading;
+        diff = Math.atan2(Math.sin(diff), Math.cos(diff));
+        w.heading += diff * 0.12;
+
+        const phase = t * w.speed * 5 + w.offset;
+        const swing = Math.sin(phase) * 0.7;
+        const L = w.mesh.userData.limbs;
+        L.legL.rotation.x = swing;
+        L.legR.rotation.x = -swing;
+        L.armL.rotation.x = -swing * 0.8;
+        L.armR.rotation.x = swing * 0.8;
+
+        w.mesh.position.set(x, groundY(x, z, t) + Math.abs(Math.sin(phase)) * 0.04, z);
+        w.mesh.rotation.y = w.heading;
+      });
+    },
+  };
+}
+
