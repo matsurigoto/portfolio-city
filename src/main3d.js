@@ -101,7 +101,7 @@ const ROAD_Y = 0.73;
 function layoutIsland(d) {
   const items = data.items.filter((it) => it.district === d.id);
   const n = items.length;
-  const perRow = n <= 2 ? Math.max(n, 1) : Math.min(6, Math.ceil(Math.sqrt(n) * 1.2));
+  const perRow = n <= 2 ? Math.max(n, 1) : Math.min(30, Math.ceil(Math.sqrt(n) * 1.2));
   const rows = Math.max(1, Math.ceil(n / perRow));
   const cells = [];
   items.forEach((item, idx) => {
@@ -137,7 +137,7 @@ const northEdge = Math.max(...layouts.map((L) => L.R - L.zc));
 // 依視窗寬高比調整距離,讓所有島嶼都入鏡
 let camDist = 55;
 function fitCamera() {
-  const fitW = (worldW + 16) / 2 / (Math.tan(THREE.MathUtils.degToRad(22.5)) * camera.aspect);
+  const fitW = (worldW * 1.3 + 16) / 2 / (Math.tan(THREE.MathUtils.degToRad(22.5)) * camera.aspect);
   camDist = Math.max(55, fitW, (southEdge + northEdge) * 1.5);
   camera.position.set(0, camDist * 0.42, camDist);
   controls.maxDistance = camDist * 1.7;
@@ -360,7 +360,7 @@ function decorateIsland(group, L, seed) {
   ];
   facilities.forEach(([on, make, rad, lo, hi]) => on && put(make, rad, false, L.R * lo, L.R * hi, 200, false));
 
-  const area = (L.R / 8) ** 2;
+  const area = Math.min((L.R / 8) ** 2, 6); // 超大島不再線性增加,避免物件過多
   const kinds = [
     [makePine, 5, true, 0.8, false], [makeRoundTree, 5, true, 0.9, false], [makeBush, 8, false, 0.5, true],
     [makeRock, 5, false, 0.5, false], [makeFlowers, 8, false, 0.4, true],
@@ -370,7 +370,7 @@ function decorateIsland(group, L, seed) {
   });
 }
 
-function makeLabel(text, x, y) {
+function makeLabel(text, x, y, k = 1) {
   const c = document.createElement("canvas");
   c.width = 256; c.height = 96;
   const g = c.getContext("2d");
@@ -381,7 +381,7 @@ function makeLabel(text, x, y) {
   g.textAlign = "center"; g.textBaseline = "middle";
   g.fillText(text, 128, 50);
   const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(c), depthTest: false }));
-  sp.scale.set(4.5, 1.7, 1);
+  sp.scale.set(4.5 * k, 1.7 * k, 1);
   sp.position.set(x, y, 0);
   return sp;
 }
@@ -407,7 +407,8 @@ layouts.forEach((L, i) => {
   sand.position.set(0, -0.2, L.zc);
   group.add(sand);
 
-  group.add(makeLabel(L.d.name, 0, 11));
+  const labelK = Math.max(1, L.R / 10);
+  group.add(makeLabel(L.d.name, 0, 11 * labelK, labelK));
   islands.push({ group, phase: i });
 
   buildRoads(group, L);
@@ -485,7 +486,7 @@ const boatSpecs = Array.from({ length: Math.min(12, 2 + Math.ceil(totalItems / 3
 const boats = createBoats(boatSpecs);
 boats.meshes.forEach((m) => scene.add(m));
 
-const gulls = createGulls(6 + totalItems, centers);
+const gulls = createGulls(Math.min(6 + totalItems, 40), centers);
 gulls.meshes.forEach((m) => scene.add(m));
 
 // ---------- 行人 ----------
@@ -505,14 +506,14 @@ const walkerSets = [];
 walkerSets.push(
   createWalkers(
     layouts.flatMap((L) => [{ x: L.cx - L.xe + 0.8, z: 0 }, { x: L.cx + L.xe - 0.8, z: 0 }]),
-    groundY, 2 + totalItems, 1.1
+    groundY, Math.min(2 + totalItems, 40), 1.1
   )
 );
 layouts.forEach((L) => {
   const p = [[-L.rx, 0], [L.rx, 0], [L.rx, L.zmax], [-L.rx, L.zmax]];
   if (L.zmin < 0) p.push([-L.rx, L.zmin], [L.rx, L.zmin], [L.rx, 0]);
   else p.push([-L.rx, 0]);
-  walkerSets.push(createWalkers(p.map(([x, z]) => ({ x: L.cx + x, z })), groundY, 1 + L.n, 1.1));
+  walkerSets.push(createWalkers(p.map(([x, z]) => ({ x: L.cx + x, z })), groundY, Math.min(1 + L.n, 40), 1.1));
 });
 const walkerMeshes = walkerSets.flatMap((w) => w.meshes);
 walkerMeshes.forEach((m) => scene.add(m));
