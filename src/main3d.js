@@ -3,6 +3,7 @@ import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { createSea, waveHeight } from "./ocean3d.js";
 import { makeDock, makeBridge, makeBoat, createBoats, createGulls, createWalkers, makeBubble } from "./props3d.js";
+import { makeLandmark } from "./landmarks3d.js";
 
 const data = await (await fetch("content.json")).json();
 
@@ -74,6 +75,18 @@ function makeBuilding(name, footprint) {
   wrap.add(m);
   wrap.userData.height = size.y * k;
   return wrap;
+}
+
+// 達到此等級即以特製地標取代一般建築(部落格需 Lv.2,其餘 Lv.1)
+const LANDMARK_LEVEL = { blog: 2, youtube: 1, speech: 1, book: 1 };
+const VARIETY = ["building-a", "building-c", "building-d", "building-f", "building-h", "building-i"];
+
+// 一般建築依項目 id 雜湊挑選外觀,避免整排房子一模一樣
+function pickModel(style, item, level) {
+  if (level > 0) return style.models[level];
+  let h = 0;
+  for (const ch of item.id) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+  return item.category === "blog" ? VARIETY[h % VARIETY.length] : style.models[0];
 }
 
 function getLevel(item) {
@@ -447,7 +460,8 @@ layouts.forEach((L, i) => {
   L.cells.forEach(({ item, bx, bz }) => {
     const style = CATEGORY[item.category] || CATEGORY.blog;
     const level = getLevel(item);
-    const b = makeBuilding(style.models[level], style.footprint);
+    const lm = level >= (LANDMARK_LEVEL[item.category] ?? 2) ? makeLandmark(item.category, style.footprint * 1.25) : null;
+    const b = lm || makeBuilding(pickModel(style, item, level), style.footprint);
     b.position.set(bx, 0.7, bz);
     b.userData.item = item;
 
