@@ -124,7 +124,7 @@ export function createGulls(count, centers) {
     return {
       mesh,
       cx: c.x, cz: c.z,
-      radius: 7 + (i % 4) * 2.5,
+      radius: (c.r || 8) * 0.9 + (i % 4) * 2.5,
       height: 9 + (i % 5) * 1.6,
       speed: (0.35 + (i % 3) * 0.08) * (i % 2 ? 1 : -1),
       phase: i * 1.7,

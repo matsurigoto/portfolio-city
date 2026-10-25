@@ -54,6 +54,8 @@ npm run dev
 
 > 3D 版使用 `node_modules/three`，需先執行 `npm install`。若無法使用 npm，也可以用任何靜態伺服器（例如 VS Code 的 Live Server 擴充套件）開啟；2D 版 `city2d.html` 另需 `vendor/phaser.min.js`（可從 `node_modules/phaser/dist/phaser.min.js` 手動複製）。
 
+城市會隨作品數量成長：作品越多，島嶼越大、道路與路燈/長椅越多、解鎖更多設施（噴水池、涼亭、燈塔、摩天輪、第二座碼頭），行人、小船、海鷗也隨之增加。可在網址加上 `?demo=N`（例如 `http://localhost:5173/?demo=6`）為每個區域額外塞入 N 件假作品來預覽。點擊行人會冒出對話氣泡。
+
 ## ✏️ 新增你的內容
 
 編輯 `content.json`，在 `items` 陣列中新增一筆資料即可，例如新增一篇部落格文章：

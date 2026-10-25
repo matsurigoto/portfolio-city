@@ -34,9 +34,9 @@ const fragmentShader = /* glsl */ `
   uniform float uTime;
   uniform vec3 uIslands[8];
   uniform int uCount;
-  uniform float uRadius;
   uniform vec3 uSunDir;
   uniform vec3 uSky;
+  uniform vec2 uFog;
   varying vec3 vWorld;
   varying float vH;
   ${WAVE_GLSL}
@@ -54,13 +54,12 @@ const fragmentShader = /* glsl */ `
     n.xz += 0.06 * vec2(sin(p.x * 3.1 + uTime * 1.4), cos(p.y * 3.7 - uTime * 1.2));
     n = normalize(n);
 
-    // 與最近島嶼的距離,用來決定淺水色與泡沫
-    float d = 1e3;
+    // 與最近島嶼岸邊的距離(各島半徑不同,存在 z 分量),用來決定淺水色與泡沫
+    float shore = 1e3;
     for (int i = 0; i < 8; i++) {
       if (i >= uCount) break;
-      d = min(d, length(p - uIslands[i].xy));
+      shore = min(shore, length(p - uIslands[i].xy) - uIslands[i].z);
     }
-    float shore = d - uRadius;
     float shallow = smoothstep(7.0, 0.0, shore);
 
     vec3 deep = vec3(0.04, 0.27, 0.55);
@@ -85,13 +84,14 @@ const fragmentShader = /* glsl */ `
 
     // 遠景融入天空色
     float dist = length(cameraPosition - vWorld);
-    col = mix(col, uSky, smoothstep(110.0, 230.0, dist));
+    col = mix(col, uSky, smoothstep(uFog.x, uFog.y, dist));
     gl_FragColor = vec4(col, 1.0);
   }
 `;
 
-export function createSea(centers, radius, sky, sunDir) {
-  const arr = Array.from({ length: 8 }, (_, i) => (centers[i] ? new THREE.Vector3(centers[i].x, centers[i].z, 0) : new THREE.Vector3()));
+// centers: [{x, z, r}],島嶼數量上限 8;size 為海面邊長;fog 為 [近, 遠] 距離
+export function createSea(centers, sky, sunDir, size = 500, fog = [110, 230]) {
+  const arr = Array.from({ length: 8 }, (_, i) => (centers[i] ? new THREE.Vector3(centers[i].x, centers[i].z, centers[i].r) : new THREE.Vector3()));
   const material = new THREE.ShaderMaterial({
     vertexShader,
     fragmentShader,
@@ -99,12 +99,13 @@ export function createSea(centers, radius, sky, sunDir) {
       uTime: { value: 0 },
       uIslands: { value: arr },
       uCount: { value: Math.min(centers.length, 8) },
-      uRadius: { value: radius },
       uSunDir: { value: sunDir.clone().normalize() },
       uSky: { value: new THREE.Color(sky).convertLinearToSRGB() },
+      uFog: { value: new THREE.Vector2(...fog) },
     },
   });
-  const sea = new THREE.Mesh(new THREE.PlaneGeometry(500, 500, 250, 250), material);
+  const seg = Math.min(400, Math.round(size / 2));
+  const sea = new THREE.Mesh(new THREE.PlaneGeometry(size, size, seg, seg), material);
   sea.rotation.x = -Math.PI / 2;
   sea.position.y = -0.3;
   return sea;
