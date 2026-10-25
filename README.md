@@ -16,24 +16,22 @@
 
 ```
 portfolio-city/
-├── index.html          # 預設首頁：3D 版 (Three.js)
-├── city2d.html         # 2D 版 (Phaser)，網址 /city2d.html
-├── content.json         # 資料模型：分區 (districts) 與內容項目 (items)
+├── index.html          # 預設首頁：3D 版 (Three.js，由 Vite 打包)
+├── city2d.html         # 2D 版 (Phaser)，僅開發模式可用：/city2d.html
+├── vite.config.js      # Vite 設定 (base 為相對路徑)
+├── public/             # 靜態檔案，原樣複製到 dist/
+│   ├── content.json         # 資料模型：分區 (districts) 與內容項目 (items)
+│   ├── assets/              # 2D 美術素材 (SVG)
+│   │   ├── models/kenney-city/   # 3D 建築模型 (Kenney City Kit, CC0)
+│   │   └── *.svg                 # 2D 建築、島嶼基座、星星徽章
+│   └── vendor/              # Phaser 執行檔 (由 npm postinstall 自動產生，不入版控)
 ├── src/
 │   ├── main3d.js         # 3D 場景：島嶼、Kenney 建築模型、植物裝飾、互動面板
 │   ├── ocean3d.js        # 水面 shader 與波浪公式
-│   ├── props3d.js        # 碼頭、橋梁、小船、海鷗
+│   ├── props3d.js        # 碼頭、橋梁、小船、海鷗、行人
 │   └── main.js           # 2D 版 Phaser 場景邏輯
-├── assets/               # 2D 美術素材 (SVG，原創手繪，可自由替換)
-│   ├── models/kenney-city/   # 3D 建築模型 (Kenney City Kit, CC0)
-│   ├── building-blog.svg     # 部落格 → 小屋
-│   ├── building-youtube.svg  # YouTube → 電視塔
-│   ├── building-speech.svg   # 演講 → 露天劇場
-│   ├── building-book.svg     # 出書 → 圖書館
-│   ├── island-base.svg       # 島嶼基座 (依分區顏色 tint 上色)
-│   └── star-badge.svg        # 等級星星徽章
-├── vendor/                # 本地化的 Phaser 執行檔 (由 npm postinstall 自動產生)
-├── scripts/copy-vendor.js # 安裝後自動複製 Phaser 到 vendor/
+├── scripts/copy-vendor.js # 安裝後自動複製 Phaser 到 public/vendor/
+├── .github/workflows/deploy.yml  # 推到 main 時自動部署到 GitHub Pages
 └── docs/                 # README 用截圖
 ```
 
@@ -42,23 +40,24 @@ portfolio-city/
 需求：Node.js 18+
 
 ```bash
-npm install     # 安裝相依套件，並自動把 Phaser 複製到 vendor/
-npm start       # 啟動本機伺服器 (http://localhost:5173)
+npm install     # 安裝相依套件
+npm start       # Vite 開發伺服器 (http://localhost:5173)，修改後自動重新載入
+npm run build   # 打包到 dist/
+npm run preview # 預覽打包結果
 ```
 
-或啟動時自動開啟瀏覽器：
+## ☁️ 部署到 GitHub Pages
 
-```bash
-npm run dev
-```
+1. 到 repo 的 **Settings → Pages**，Source 選 **GitHub Actions**。
+2. 把程式合併到 `main`，`.github/workflows/deploy.yml` 會自動建置並發佈，網址為 `https://<帳號>.github.io/portfolio-city/`。
 
-> 3D 版使用 `node_modules/three`，需先執行 `npm install`。若無法使用 npm，也可以用任何靜態伺服器（例如 VS Code 的 Live Server 擴充套件）開啟；2D 版 `city2d.html` 另需 `vendor/phaser.min.js`（可從 `node_modules/phaser/dist/phaser.min.js` 手動複製）。
+也可以把 `dist/` 上傳到 Cloudflare Pages、Netlify 等任何靜態主機。2D 版不會被打包進 `dist/`。
 
 城市會隨作品數量成長：作品越多，島嶼越大、道路與路燈/長椅越多、解鎖更多設施（噴水池、涼亭、燈塔、摩天輪、第二座碼頭），行人、小船、海鷗也隨之增加。可在網址加上 `?demo=N`（例如 `http://localhost:5173/?demo=6`）為每個區域額外塞入 N 件假作品來預覽。點擊行人會冒出對話氣泡。
 
 ## ✏️ 新增你的內容
 
-編輯 `content.json`，在 `items` 陣列中新增一筆資料即可，例如新增一篇部落格文章：
+編輯 `public/content.json`，在 `items` 陣列中新增一筆資料即可，例如新增一篇部落格文章：
 
 ```json
 {
