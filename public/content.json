@@ -31,18 +31,6 @@
   ],
   "items": [
     {
-      "id": "yt-001",
-      "district": "media",
-      "category": "youtube",
-      "title": "五分鐘搞懂複利",
-      "date": "2023-03-15",
-      "metric": {
-        "views": 30000
-      },
-      "link": "https://youtube.com/watch?v=xxx",
-      "description": "用生活化例子解釋複利效果。"
-    },
-    {
       "id": "talk-001",
       "district": "stage",
       "category": "speech",
@@ -6069,6 +6057,186 @@
       },
       "link": "https://dog0416.blogspot.com/2008/04/2007-09-26.html",
       "description": "連續假期的後兩天，當然就是快樂的趕程式， 不知道其他人寫專題都有這種感覺， 我相當害怕寫出來的東西不夠格去發表，到時候被打回票， 也許是我的指導教授比較放任學生去自由研究的關係， …"
+    },
+    {
+      "id": "yt-001",
+      "district": "media",
+      "category": "youtube",
+      "title": "你的 AI Agent 有紀律了！GitHub Copilot Hook 完整教學，讓你控制 Agent 每一步",
+      "date": "2026-05-31",
+      "metric": {
+        "views": 1944
+      },
+      "link": "https://www.youtube.com/watch?v=E1bHVIYcq-E",
+      "description": "用 Hooks 建立企業級 Guardrails"
+    },
+    {
+      "id": "yt-002",
+      "district": "media",
+      "category": "youtube",
+      "title": "VS Code 5 大新功能 - 打造更聰明的 AI Agents",
+      "date": "2026-03-26",
+      "metric": {
+        "views": 4628
+      },
+      "link": "https://www.youtube.com/watch?v=PV0iGbGy8S8",
+      "description": "這支影片要來聊聊最近 VS Code / GitHub Copilot Agent 體驗裡，幾個非常值得注意的新功能。"
+    },
+    {
+      "id": "yt-003",
+      "district": "media",
+      "category": "youtube",
+      "title": "VS Code Agent Skills 完整教學｜什麼是 Skill？怎麼建立？跟 Prompt File 差在哪？",
+      "date": "2026-03-08",
+      "metric": {
+        "views": 10553
+      },
+      "link": "https://www.youtube.com/watch?v=rnzYMQiCfoY",
+      "description": "你有沒有這種感覺："
+    },
+    {
+      "id": "yt-004",
+      "district": "media",
+      "category": "youtube",
+      "title": "Linkedin CEO 揭露未來5年職涯趨勢：當學歷貶值 AI 崛起，我們該如何重新定位？",
+      "date": "2026-02-24",
+      "metric": {
+        "views": 324
+      },
+      "link": "https://www.youtube.com/watch?v=z4_jja8DW7g",
+      "description": "最近常聽到一句話：「AI 會取代我們的工作。」"
+    },
+    {
+      "id": "yt-005",
+      "district": "media",
+      "category": "youtube",
+      "title": "Teams 會議生產力必備工具：協作筆記與計時器，一場會議少講 20 分鐘",
+      "date": "2026-02-09",
+      "metric": {
+        "views": 1022
+      },
+      "link": "https://www.youtube.com/watch?v=-tmk3_N8KSg",
+      "description": "開會內容不再發散：Teams 協作筆記 + 計時器"
+    },
+    {
+      "id": "yt-006",
+      "district": "media",
+      "category": "youtube",
+      "title": "GitHub Agent HQ AI 工程師的指揮中心 | Copilot 到多 Agent 協作，GitHub 正在重塑軟體開發流程",
+      "date": "2026-01-18",
+      "metric": {
+        "views": 1908
+      },
+      "link": "https://www.youtube.com/watch?v=lgIOwyZQWxQ",
+      "description": "GitHub 在去年 GitHub Universe 2025 提出了 Agent HQ 這個關鍵概念，"
+    },
+    {
+      "id": "yt-007",
+      "district": "media",
+      "category": "youtube",
+      "title": "用 GitHub Copilot 現代化您的 .NET 應用程式 - 從 .NET Framework 升級至現代 .NET",
+      "date": "2026-01-10",
+      "metric": {
+        "views": 1078
+      },
+      "link": "https://www.youtube.com/watch?v=4418XdDwSoY",
+      "description": "這支影片我會用「Modernize .NET apps in days with GitHub Copilot」的概念，帶你用 Copilot 來加速舊系統現代化：從盤點相依、找出…"
+    },
+    {
+      "id": "yt-008",
+      "district": "media",
+      "category": "youtube",
+      "title": "Microsoft Teams Q&A 模式超實用！一鍵控管提問、整理問題、避免會議聊天室爆炸！",
+      "date": "2025-12-07",
+      "metric": {
+        "views": 303
+      },
+      "link": "https://www.youtube.com/watch?v=kJQyo0JvR2o",
+      "description": "教你開啟 Q&A、審核問題、私訊回答、熱門排序＋最適合的使用場景"
+    },
+    {
+      "id": "yt-009",
+      "district": "media",
+      "category": "youtube",
+      "title": "GitHub Copilot Coding Agent 整合 Slack、Teams、Linear：AI 自動修 Bug、寫 Code、跑任務示範！",
+      "date": "2025-12-05",
+      "metric": {
+        "views": 875
+      },
+      "link": "https://www.youtube.com/watch?v=cv3VCqCZBuw",
+      "description": "三大協作平台整合 Copilot Coding Agent，全面自動化開發工作、加速專案交付流程"
+    },
+    {
+      "id": "yt-010",
+      "district": "media",
+      "category": "youtube",
+      "title": "VS Code Plan Agent 完整教學：寫程式前 AI 先幫你規劃！",
+      "date": "2025-11-28",
+      "metric": {
+        "views": 2643
+      },
+      "link": "https://www.youtube.com/watch?v=43Swz6stWwc",
+      "description": "從想法到完整計畫：Plan Agent 幫你先做好 90% 的功課"
+    },
+    {
+      "id": "yt-011",
+      "district": "media",
+      "category": "youtube",
+      "title": "Azure DevOps 也能用 GitHub Copilot / Coding Agent？完整實測！",
+      "date": "2025-11-21",
+      "metric": {
+        "views": 872
+      },
+      "link": "https://www.youtube.com/watch?v=xmMc2l9-4jQ",
+      "description": "這支影片示範 兩種 AI 驅動的 Azure DevOps 使用方式："
+    },
+    {
+      "id": "yt-012",
+      "district": "media",
+      "category": "youtube",
+      "title": "主講者模式大解鎖！4 種 Presenter Mode 一次看懂，提高你的簡報專業度！",
+      "date": "2025-11-17",
+      "metric": {
+        "views": 393
+      },
+      "link": "https://www.youtube.com/watch?v=pQHC4che3xw",
+      "description": "Standout、Side-by-side、Reporter… 教你最佳使用場景＋畫面超專業的啟動技巧"
+    },
+    {
+      "id": "yt-013",
+      "district": "media",
+      "category": "youtube",
+      "title": ". NET Conf 2025 Taiwan 完整講師與議程",
+      "date": "2025-11-15",
+      "metric": {
+        "views": 130
+      },
+      "link": "https://www.youtube.com/shorts/p5Py-Df2QGc",
+      "description": "完整議程： https://dotnetconf.study4.tw/Session"
+    },
+    {
+      "id": "yt-014",
+      "district": "media",
+      "category": "youtube",
+      "title": "2025 GitHub Octoverse 關鍵報告全解析  | 1.8 億開發者、AI 專案翻倍、TypeScript 登頂、預設自動化取代安全左移",
+      "date": "2025-11-09",
+      "metric": {
+        "views": 219
+      },
+      "link": "https://www.youtube.com/watch?v=UlGckbybqKA",
+      "description": "從「每秒 1 位新開發者」到「TypeScript 首度稱王」：看懂 GitHub 的關鍵轉折"
+    },
+    {
+      "id": "yt-015",
+      "district": "media",
+      "category": "youtube",
+      "title": ".NET Conf 2025 Taiwan 講師搶先看",
+      "date": "2025-11-06",
+      "metric": {
+        "views": 314
+      },
+      "link": "https://www.youtube.com/shorts/NSZE0EatIIU",
+      "description": "11/29 台大社科院，我們不見不散"
     }
   ]
 }
