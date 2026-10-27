@@ -9,6 +9,9 @@ const data = await (await fetch("content.json")).json();
 
 // ?demo=N 會替每個區域額外塞 N 件假作品,用來預覽城市隨內容成長的樣子
 const demoCount = Number(new URLSearchParams(location.search).get("demo")) || 0;
+// ?embed=1 供 iframe 嵌入:隱藏標題與操作提示,減少動態物件
+const EMBED = new URLSearchParams(location.search).has("embed");
+if (EMBED) document.body.classList.add("embed");
 if (demoCount > 0) {
   const cats = ["blog", "youtube", "speech", "book"];
   const seed = rng(42);
@@ -30,7 +33,7 @@ const camera = new THREE.PerspectiveCamera(45, innerWidth / innerHeight, 0.1, 20
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(innerWidth, innerHeight);
-renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setPixelRatio(Math.min(devicePixelRatio, EMBED ? 1.5 : 2));
 renderer.shadowMap.enabled = true;
 document.body.appendChild(renderer.domElement);
 
@@ -530,7 +533,7 @@ const boatSpecs = Array.from({ length: Math.min(12, 2 + Math.ceil(totalItems / 3
 const boats = createBoats(boatSpecs);
 boats.meshes.forEach((m) => scene.add(m));
 
-const gulls = createGulls(Math.min(6 + totalItems, 40), centers);
+const gulls = createGulls(Math.min(6 + totalItems, EMBED ? 12 : 40), centers);
 gulls.meshes.forEach((m) => scene.add(m));
 
 // ---------- 行人 ----------
@@ -550,14 +553,14 @@ const walkerSets = [];
 walkerSets.push(
   createWalkers(
     layouts.flatMap((L) => [{ x: L.cx - L.xe + 0.8, z: 0 }, { x: L.cx + L.xe - 0.8, z: 0 }]),
-    groundY, Math.min(2 + totalItems, 40), 1.1
+    groundY, Math.min(2 + totalItems, EMBED ? 12 : 40), 1.1
   )
 );
 layouts.forEach((L) => {
   const p = [[-L.rx, 0], [L.rx, 0], [L.rx, L.zmax], [-L.rx, L.zmax]];
   if (L.zmin < 0) p.push([-L.rx, L.zmin], [L.rx, L.zmin], [L.rx, 0]);
   else p.push([-L.rx, 0]);
-  walkerSets.push(createWalkers(p.map(([x, z]) => ({ x: L.cx + x, z })), groundY, Math.min(1 + L.n, 40), 1.1));
+  walkerSets.push(createWalkers(p.map(([x, z]) => ({ x: L.cx + x, z })), groundY, Math.min(1 + L.n, EMBED ? 10 : 40), 1.1));
 });
 const walkerMeshes = walkerSets.flatMap((w) => w.meshes);
 walkerMeshes.forEach((m) => scene.add(m));

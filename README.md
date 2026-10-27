@@ -84,6 +84,22 @@ npm run preview # 預覽打包結果
 - `category`：`blog` / `youtube` / `speech` / `book`，決定使用哪個建築美術素材
 - `metric`：取第一個數值判斷等級門檻（目前：≥20000 為 Lv.2、≥5000 為 Lv.1、其餘 Lv.0），`getLevel()` 在 `src/main3d.js`（3D）與 `src/main.js`（2D）各有一份。`metric` 可省略（留空 `{}`），此時為 Lv.0。目前創作島已匯入 `note.duranhsieh.com` 與 `dog0416.blogspot.com` 的部落格文章。
 
+## 🔗 嵌入部落格或 GitHub Profile
+
+**部落格（支援 HTML 的平台，如 Blogger）**：加上 `?embed=1` 會隱藏標題與操作提示，並減少海鷗、行人數量以節省效能。
+
+```html
+<iframe src="https://matsurigoto.github.io/portfolio-city/?embed=1" width="100%" height="600" style="border:0" loading="lazy" allowfullscreen></iframe>
+```
+
+**GitHub Profile README**：GitHub 會過濾 `<iframe>` 與 JavaScript，改放預覽圖並連到網站：
+
+```md
+[![個人履歷城市](https://raw.githubusercontent.com/matsurigoto/portfolio-city/scaffold/docs/preview.png)](https://matsurigoto.github.io/portfolio-city/)
+```
+
+`docs/preview.png` 可用 headless 瀏覽器重新擷取 `?embed=1` 畫面更新。
+
 ## 🎨 美術素材說明
 
 3D 版建築使用 [Kenney City Kit (Commercial)](https://kenney.nl/assets/city-kit-commercial)（CC0），其餘樹木、設施、橋梁、船、行人皆為程式產生。2D 版使用 `public/assets/` 內的原創手繪 SVG（等角簡化風格），可直接替換成你自己的美術圖，只要維持相同檔名與尺寸比例即可。
