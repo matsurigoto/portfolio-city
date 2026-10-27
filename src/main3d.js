@@ -3,7 +3,7 @@ import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { createSea, waveHeight } from "./ocean3d.js";
 import { makeDock, makeBridge, makeBoat, createBoats, createGulls, createWalkers, makeBubble } from "./props3d.js";
-import { makeLandmark } from "./landmarks3d.js";
+import { makeLandmark, makeMediaBuilding, MEDIA_VARIANTS } from "./landmarks3d.js";
 
 const data = await (await fetch("content.json")).json();
 
@@ -81,8 +81,17 @@ function makeBuilding(name, footprint) {
 }
 
 // 達到此等級即以特製地標取代一般建築(部落格需 Lv.2,其餘 Lv.1)
-const LANDMARK_LEVEL = { blog: 2, youtube: 1, speech: 1, book: 1 };
+const LANDMARK_LEVEL = { blog: 2, youtube: 2, speech: 1, book: 1 };
 const VARIETY = ["building-a", "building-c", "building-d", "building-f", "building-h", "building-i"];
+
+// 影片依 id 雜湊輪流使用攝影棚、電影院、轉播站、直播圓頂與摩天大樓
+function makeMediaVariant(item, _i, style) {
+  let h = 0;
+  for (const ch of item.id) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+  const v = h % (MEDIA_VARIANTS + 1);
+  if (v === MEDIA_VARIANTS) return makeBuilding(style.models[Math.min(getLevel(item), 2)], style.footprint);
+  return makeMediaBuilding(v, style.footprint * 1.25);
+}
 
 // 一般建築依項目 id 雜湊挑選外觀,避免整排房子一模一樣
 function pickModel(style, item, level) {
@@ -562,7 +571,7 @@ layouts.forEach((L, i) => {
     const style = CATEGORY[item.category] || CATEGORY.blog;
     const level = getLevel(item);
     const lm = level >= (LANDMARK_LEVEL[item.category] ?? 2) ? makeLandmark(item.category, style.footprint * 1.25) : null;
-    const b = lm || makeBuilding(pickModel(style, item, level), style.footprint);
+    const b = lm || (item.category === "youtube" ? makeMediaVariant(item, i, style) : makeBuilding(pickModel(style, item, level), style.footprint));
     b.position.set(bx, 0.7, bz);
     b.userData.item = item;
 
