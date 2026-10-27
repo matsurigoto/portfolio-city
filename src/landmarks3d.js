@@ -111,6 +111,83 @@ function bookTower() {
 
 const BUILDERS = { blog: clockTower, youtube: playTower, speech: amphitheater, book: bookTower };
 
+// 攝影棚:寬矮棚屋、斜屋頂、ON AIR 招牌與攝影機
+function studio() {
+  const g = new THREE.Group();
+  g.add(mesh(new THREE.BoxGeometry(3.4, 1.8, 2.4), mat(0x455a64), 0, 0.9, 0));
+  const roof = mesh(new THREE.BoxGeometry(3.6, 0.2, 2.6), mat(0x263238), 0, 1.9, 0);
+  roof.rotation.z = 0.08;
+  g.add(roof);
+  g.add(mesh(new THREE.BoxGeometry(1.2, 1.2, 0.08), mat(0x90caf9, { emissive: 0x1565c0, emissiveIntensity: 0.3 }), -0.6, 1.0, 1.22));
+  g.add(mesh(new THREE.BoxGeometry(0.9, 0.35, 0.12), mat(0xe53935, { emissive: 0xff1744, emissiveIntensity: 0.7 }), 1.0, 1.5, 1.24));
+  g.add(mesh(new THREE.CylinderGeometry(0.05, 0.05, 1.2, 6), mat(0x90a4ae), 0, 2.6, 0));
+  g.add(mesh(new THREE.BoxGeometry(0.7, 0.4, 0.4), mat(0x212121), 0.3, 3.3, 0));
+  g.add(mesh(new THREE.CylinderGeometry(0.15, 0.2, 0.3, 8), mat(0x37474f), 0.8, 3.3, 0).rotateZ(Math.PI / 2));
+  return g;
+}
+
+// 電影院:霓虹遮簷、發光招牌與頂端膠卷盤
+function cinema() {
+  const g = new THREE.Group();
+  g.add(mesh(new THREE.BoxGeometry(2.8, 2.6, 2.2), mat(0x7b1fa2), 0, 1.3, 0));
+  g.add(mesh(new THREE.BoxGeometry(3.2, 0.2, 1.0), mat(0xffd54f, { emissive: 0xffa000, emissiveIntensity: 0.6 }), 0, 1.2, 1.4));
+  [-1.3, 1.3].forEach((x) => g.add(mesh(new THREE.CylinderGeometry(0.06, 0.06, 1.2, 6), mat(0xeeeeee), x, 0.6, 1.8)));
+  g.add(mesh(new THREE.BoxGeometry(2.2, 0.8, 0.12), mat(0xfff59d, { emissive: 0xffeb3b, emissiveIntensity: 0.8 }), 0, 2.1, 1.14));
+  g.add(mesh(new THREE.BoxGeometry(0.8, 1.0, 0.08), mat(0x311b92), 0, 0.5, 1.12));
+  [-0.45, 0.45].forEach((x, i) => {
+    const reel = mesh(new THREE.CylinderGeometry(0.5, 0.5, 0.15, 14), mat(i ? 0xe0e0e0 : 0xbdbdbd), x, 3.2, 0);
+    reel.rotation.x = Math.PI / 2;
+    g.add(reel);
+    g.add(mesh(new THREE.CylinderGeometry(0.15, 0.15, 0.18, 8), mat(0x212121), x, 3.2, 0).rotateX(Math.PI / 2));
+  });
+  return g;
+}
+
+// 轉播站:矮機房加大型衛星碟
+function broadcast() {
+  const g = new THREE.Group();
+  g.add(mesh(new THREE.BoxGeometry(2.2, 1.2, 2.2), mat(0xeceff1), 0, 0.6, 0));
+  g.add(mesh(new THREE.BoxGeometry(2.3, 0.15, 2.3), mat(0x00acc1), 0, 1.25, 0));
+  g.add(mesh(new THREE.CylinderGeometry(0.12, 0.2, 1.4, 6), mat(0x78909c), 0, 1.9, 0));
+  const dish = mesh(new THREE.SphereGeometry(1.1, 14, 8, 0, Math.PI * 2, 0, Math.PI / 2.4), mat(0xffffff, { side: THREE.DoubleSide }), 0, 3.0, 0);
+  dish.rotation.set(-2.2, 0.6, 0);
+  g.add(dish);
+  g.add(mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.9, 5), mat(0xb0bec5), 0, 3.5, 0.4).rotateX(0.7));
+  g.add(mesh(new THREE.SphereGeometry(0.1, 8, 8), mat(0xff5252, { emissive: 0xff1744 }), 0, 3.9, 0.75));
+  return g;
+}
+
+// 直播圓頂:玻璃圓頂加天線
+function liveDome() {
+  const g = new THREE.Group();
+  g.add(mesh(new THREE.CylinderGeometry(1.7, 1.8, 0.8, 16), mat(0x37474f), 0, 0.4, 0));
+  g.add(mesh(new THREE.SphereGeometry(1.5, 16, 10, 0, Math.PI * 2, 0, Math.PI / 2), mat(0x4dd0e1, { transparent: true, opacity: 0.85, emissive: 0x006064, emissiveIntensity: 0.35 }), 0, 0.8, 0));
+  g.add(mesh(new THREE.TorusGeometry(1.5, 0.06, 6, 20), mat(0xeceff1), 0, 0.82, 0).rotateX(Math.PI / 2));
+  g.add(mesh(new THREE.CylinderGeometry(0.04, 0.04, 1.8, 5), mat(0xb0bec5), 0, 2.6, 0));
+  g.add(mesh(new THREE.SphereGeometry(0.12, 8, 8), mat(0xff5252, { emissive: 0xff1744 }), 0, 3.55, 0));
+  return g;
+}
+
+export const MEDIA_VARIANTS = 4;
+const MEDIA = [studio, cinema, broadcast, liveDome];
+
+function fit(inner, footprint, maxH) {
+  const box = new THREE.Box3().setFromObject(inner);
+  const size = box.getSize(new THREE.Vector3());
+  const k = Math.min(footprint / Math.max(size.x, size.z), maxH / size.y);
+  inner.scale.setScalar(k);
+  inner.position.y = -box.min.y * k;
+  const group = new THREE.Group();
+  group.add(inner);
+  group.userData.height = size.y * k;
+  return group;
+}
+
+// 影音島用的多樣化建築(攝影棚、電影院、轉播站、直播圓頂)
+export function makeMediaBuilding(variant, footprint) {
+  return fit(MEDIA[variant % MEDIA.length](), footprint, 5);
+}
+
 // 回傳 { group, height } 或 null(該分類沒有地標)
 export function makeLandmark(category, footprint) {
   const build = BUILDERS[category];
