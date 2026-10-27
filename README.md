@@ -35,7 +35,7 @@ portfolio-city/
 │   ├── props3d.js        # 碼頭、橋梁、小船、海鷗、行人
 │   └── main.js           # 2D 版 Phaser 場景邏輯
 ├── scripts/copy-vendor.js # 安裝後自動複製 Phaser 到 public/vendor/
-├── .github/workflows/deploy.yml  # 推到 main 時自動部署到 GitHub Pages
+├── .github/workflows/deploy.yml  # 推到 main / scaffold 時自動部署到 GitHub Pages
 └── docs/                 # README 用截圖
 ```
 
@@ -53,7 +53,7 @@ npm run preview # 預覽打包結果
 ## ☁️ 部署到 GitHub Pages
 
 1. 到 repo 的 **Settings → Pages**，Source 選 **GitHub Actions**。
-2. 把程式合併到 `main`，`.github/workflows/deploy.yml` 會自動建置並發佈，網址為 `https://<帳號>.github.io/portfolio-city/`。
+2. 把程式合併到 `scaffold`（或 `main`），`.github/workflows/deploy.yml` 會自動建置並發佈，網址為 `https://<帳號>.github.io/portfolio-city/`。
 
 也可以把 `dist/` 上傳到 Cloudflare Pages、Netlify 等任何靜態主機。2D 版不會被打包進 `dist/`。
 
