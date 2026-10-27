@@ -135,6 +135,7 @@ function rng(seed) {
 const clickable = [];
 const islands = [];
 const swayers = [];
+const swingers = [];
 const spinners = [];
 const bobbers = [];
 
@@ -329,6 +330,97 @@ function makeFerrisWheel() {
   return g;
 }
 
+// 庭園宅:小屋加圍籬花園、花圃與小菜園
+function makeGardenHouse() {
+  const g = new THREE.Group();
+  const lawn = mesh(new THREE.BoxGeometry(4.2, 0.1, 3.4), mat(0x7cb342), 0, 0.05, 0);
+  g.add(lawn);
+  g.add(mesh(new THREE.BoxGeometry(1.7, 1.1, 1.3), mat(0xfff3e0), -0.8, 0.65, -0.6));
+  const roof = mesh(new THREE.ConeGeometry(1.45, 0.9, 4), M.red, -0.8, 1.7, -0.6);
+  roof.rotation.y = Math.PI / 4;
+  g.add(roof);
+  g.add(mesh(new THREE.BoxGeometry(0.3, 0.6, 0.05), M.wood, -0.8, 0.4, 0.06));
+  g.add(mesh(new THREE.BoxGeometry(0.35, 0.3, 0.05), mat(0x81d4fa), -1.35, 0.8, 0.06));
+  g.add(mesh(new THREE.BoxGeometry(0.3, 0.7, 0.3), M.stone, -0.3, 1.8, -0.9));
+  g.add(mesh(new THREE.BoxGeometry(0.9, 0.04, 2.2), mat(0xd7ccc8), -0.8, 0.12, 1.0)); // 小徑
+  for (let i = -2; i <= 2; i++) {
+    g.add(mesh(new THREE.BoxGeometry(0.06, 0.45, 0.06), M.white, i * 0.9, 0.3, 1.6));
+    g.add(mesh(new THREE.BoxGeometry(0.06, 0.45, 0.06), M.white, i * 0.9, 0.3, -1.6));
+  }
+  [-1.6, 1.6].forEach((z) => g.add(mesh(new THREE.BoxGeometry(4.2, 0.05, 0.05), M.white, 0, 0.4, z)));
+  [-2.1, 2.1].forEach((x) => g.add(mesh(new THREE.BoxGeometry(0.05, 0.05, 3.2), M.white, x, 0.4, 0)));
+  for (let i = 0; i < 4; i++) {
+    g.add(mesh(new THREE.BoxGeometry(0.9, 0.12, 0.45), M.wood, 0.9 + (i % 2) * 0.95, 0.15, -0.7 + Math.floor(i / 2) * 0.7));
+    g.add(mesh(new THREE.IcosahedronGeometry(0.2, 0), M.petals[i], 0.9 + (i % 2) * 0.95, 0.3, -0.7 + Math.floor(i / 2) * 0.7));
+  }
+  g.add(mesh(new THREE.CylinderGeometry(0.1, 0.14, 0.9, 6), M.trunk, 1.5, 0.55, 0.9));
+  g.add(mesh(new THREE.IcosahedronGeometry(0.55, 0), M.leaf2, 1.5, 1.35, 0.9));
+  return g;
+}
+
+// 公園:草坪、池塘、步道、長椅與樹
+function makePark() {
+  const g = new THREE.Group();
+  g.add(mesh(new THREE.CylinderGeometry(3.2, 3.3, 0.12, 20), mat(0x8bc34a), 0, 0.06, 0));
+  g.add(mesh(new THREE.CylinderGeometry(1.1, 1.1, 0.14, 16), M.water, 0.7, 0.1, -0.5));
+  g.add(mesh(new THREE.TorusGeometry(1.12, 0.07, 5, 16), M.stone, 0.7, 0.14, -0.5).rotateX(Math.PI / 2));
+  g.add(mesh(new THREE.BoxGeometry(5.6, 0.05, 0.6), mat(0xd7ccc8), 0, 0.14, 1.5));
+  g.add(mesh(new THREE.BoxGeometry(0.6, 0.05, 3), mat(0xd7ccc8), -1.7, 0.14, 0));
+  [[-1.2, 1.1, 0], [1.4, 1.1, 0], [-2.1, -0.4, Math.PI / 2]].forEach(([x, z, ry]) => {
+    const b = makeBench();
+    b.position.set(x, 0.1, z);
+    b.rotation.y = ry;
+    g.add(b);
+  });
+  [[-2.1, -1.5], [2.3, 0.4], [-0.6, -2.3]].forEach(([x, z], i) => {
+    g.add(mesh(new THREE.CylinderGeometry(0.13, 0.18, 1.1, 6), M.trunk, x, 0.65, z));
+    g.add(mesh(new THREE.IcosahedronGeometry(0.85, 0), i % 2 ? M.leaf : M.leaf2, x, 1.6, z));
+  });
+  [[1.5, -1.5], [2.0, -0.9]].forEach(([x, z], i) => g.add(mesh(new THREE.IcosahedronGeometry(0.3, 0), M.petals[i], x, 0.3, z)));
+  return g;
+}
+
+// 兒童遊樂場:溜滑梯、鞦韆與沙坑
+function makePlayground() {
+  const g = new THREE.Group();
+  g.add(mesh(new THREE.BoxGeometry(3.6, 0.08, 3), mat(0xffe0b2), 0, 0.04, 0));
+  g.add(mesh(new THREE.BoxGeometry(0.9, 0.08, 0.9), mat(0xffcc80), 0, 1.0, -0.8));
+  [[-0.4, -1.2], [0.4, -1.2], [-0.4, -0.4], [0.4, -0.4]].forEach(([x, z]) =>
+    g.add(mesh(new THREE.CylinderGeometry(0.04, 0.04, 1.0, 5), M.red, x, 0.5, z)));
+  g.add(mesh(new THREE.ConeGeometry(0.75, 0.5, 4), mat(0x42a5f5), 0, 1.35, -0.8).rotateY(Math.PI / 4));
+  const slide = mesh(new THREE.BoxGeometry(0.5, 0.06, 1.6), mat(0xffee58), 0, 0.5, 0.35);
+  slide.rotation.x = 0.55;
+  g.add(slide);
+  g.add(mesh(new THREE.BoxGeometry(0.06, 0.15, 1.6), M.red, -0.27, 0.55, 0.35).rotateX(0.55));
+  g.add(mesh(new THREE.BoxGeometry(0.06, 0.15, 1.6), M.red, 0.27, 0.55, 0.35).rotateX(0.55));
+  const swing = new THREE.Group();
+  [-0.8, 0.8].forEach((x) => g.add(mesh(new THREE.CylinderGeometry(0.05, 0.05, 1.6, 5), M.pole, 1.2 + x * 0.6, 0.8, 0.3)));
+  g.add(mesh(new THREE.BoxGeometry(1.2, 0.07, 0.07), M.pole, 1.2, 1.6, 0.3));
+  [-0.25, 0.25].forEach((x) => {
+    swing.add(mesh(new THREE.BoxGeometry(0.02, 0.9, 0.02), M.pole, x, -0.45, 0));
+    swing.add(mesh(new THREE.BoxGeometry(0.3, 0.05, 0.2), M.red, x, -0.92, 0));
+  });
+  swing.position.set(1.2, 1.6, 0.3);
+  g.add(swing);
+  swingers.push(swing);
+  return g;
+}
+
+// 小市集:幾座彩色遮陽棚攤位
+function makeMarket() {
+  const g = new THREE.Group();
+  const cols = [0xef5350, 0x42a5f5, 0xffca28];
+  cols.forEach((c, i) => {
+    const x = (i - 1) * 1.5;
+    g.add(mesh(new THREE.BoxGeometry(1.1, 0.6, 0.7), M.wood, x, 0.3, 0));
+    g.add(mesh(new THREE.BoxGeometry(1.3, 0.08, 1.0), mat(c), x, 1.5, 0.05));
+    [-0.55, 0.55].forEach((dx) => g.add(mesh(new THREE.CylinderGeometry(0.04, 0.04, 1.5, 5), M.white, x + dx, 0.75, 0.35)));
+    g.add(mesh(new THREE.IcosahedronGeometry(0.16, 0), mat(c), x - 0.2, 0.7, 0));
+    g.add(mesh(new THREE.IcosahedronGeometry(0.16, 0), M.leaf2, x + 0.2, 0.7, 0));
+  });
+  return g;
+}
+
 // ---------- 道路 ----------
 function addRoad(group, x1, z1, x2, z2) {
   const len = Math.hypot(x2 - x1, z2 - z1);
@@ -400,9 +492,15 @@ function decorateIsland(group, L, seed) {
   // 大型設施先放,才搶得到空位
   const facilities = [
     [L.n >= 9, makeFerrisWheel, 3.4, 0.35, 0.78],
+    [L.n >= 5, makePark, 3.6, 0.4, 0.8],
     [L.n >= 6, makeLighthouse, 1.3, 0.6, 0.84],
+    [L.n >= 7, makePlayground, 2.2, 0.4, 0.8],
     [L.n >= 4, makeGazebo, 1.9, 0.4, 0.8],
     [L.n >= 3, makeFountain, 1.7, 0.35, 0.8],
+    [L.n >= 2, makeGardenHouse, 2.6, 0.4, 0.82],
+    [L.n >= 8, makeMarket, 2.4, 0.4, 0.82],
+    [L.n >= 12, makeGardenHouse, 2.6, 0.4, 0.82],
+    [L.n >= 14, makePark, 3.6, 0.4, 0.82],
   ];
   facilities.forEach(([on, make, rad, lo, hi]) => on && put(make, rad, false, L.R * lo, L.R * hi, 200, false));
 
@@ -676,6 +774,7 @@ renderer.setAnimationLoop(() => {
 
   islands.forEach(({ group, phase }) => (group.position.y = Math.sin(t * 0.9 + phase) * 0.12));
   swayers.forEach(({ o, phase }) => (o.rotation.z = Math.sin(t * 1.3 + phase) * 0.04));
+  swingers.forEach((s, i) => (s.rotation.x = Math.sin(t * 2 + i) * 0.5));
   spinners.forEach(({ o, axis, speed }) => (o.rotation[axis] = t * speed));
 
   clickable.forEach((root) => {
