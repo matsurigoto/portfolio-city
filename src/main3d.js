@@ -109,6 +109,7 @@ function getLevel(item) {
 
 // 同一區同類別作品太多時,依年份合併成一幢地標建築,點擊後在面板列出該年全部作品
 const GROUP_THRESHOLD = 24;
+const HOT_VIEWS = 10000; // 熱門文章獨立成放大版地標,其餘依主題合併
 const CATEGORY_LABEL = { blog: "文章", youtube: "影片", speech: "演講", book: "著作" };
 const allItems = data.items;
 {
@@ -116,19 +117,21 @@ const allItems = data.items;
   data.districts.forEach((d) => {
     const items = allItems.filter((it) => it.district === d.id);
     if (items.length <= GROUP_THRESHOLD) return grouped.push(...items);
+    const hot = items.filter((it) => (it.metric?.views || 0) >= HOT_VIEWS && it.category === "blog");
+    hot.sort((a, b) => (b.metric.views - a.metric.views)).forEach((it) => grouped.push({ ...it, big: true }));
     const byKey = new Map();
-    items.forEach((it) => {
-      const key = `${it.category}|${it.date.slice(0, 4)}`;
+    items.filter((it) => !hot.includes(it)).forEach((it) => {
+      const key = `${it.category}|${it.topic || CATEGORY_LABEL[it.category] || "其他"}`;
       if (!byKey.has(key)) byKey.set(key, []);
       byKey.get(key).push(it);
     });
-    [...byKey.entries()].sort(([a], [b]) => a.split("|")[1].localeCompare(b.split("|")[1])).forEach(([key, list]) => {
-      const [category, year] = key.split("|");
+    [...byKey.entries()].sort(([, a], [, b]) => b.length - a.length).forEach(([key, list]) => {
+      const [category, topic] = key.split("|");
       list.sort((a, b) => b.date.localeCompare(a.date));
       grouped.push({
-        id: `group-${d.id}-${key}`, district: d.id, category, date: year,
-        title: `${year} 年${CATEGORY_LABEL[category] || "作品"}`,
-        description: `共 ${list.length} 篇`, children: list,
+        id: `group-${d.id}-${key}`, district: d.id, category, date: list[0].date,
+        title: `${topic}(${list.length})`,
+        description: `${topic},共 ${list.length} 篇`, children: list,
         level: list.length >= 50 ? 2 : list.length >= 20 ? 1 : 0,
       });
     });
@@ -573,6 +576,7 @@ layouts.forEach((L, i) => {
     const lm = level >= (LANDMARK_LEVEL[item.category] ?? 2) ? makeLandmark(item.category, style.footprint * 1.25) : null;
     const b = lm || (item.category === "youtube" ? makeMediaVariant(item, i, style) : makeBuilding(pickModel(style, item, level), style.footprint));
     b.position.set(bx, 0.7, bz);
+    if (item.big) b.scale.setScalar(level >= 2 ? 1.5 : 1.3);
     b.userData.item = item;
 
     for (let s = 0; s <= level; s++) {
