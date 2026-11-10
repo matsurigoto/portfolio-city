@@ -6721,6 +6721,45 @@
       },
       "link": "https://www.youtube.com/shorts/NSZE0EatIIU",
       "description": "11/29 台大社科院，我們不見不散"
+    },
+    {
+      "id": "book-001",
+      "district": "books",
+      "category": "book",
+      "title": "動手學 GitHub！現代人不能不知道的協同合作平台",
+      "date": "2022-06-20",
+      "level": 2,
+      "metric": {
+        "天瓏最佳排名": 1
+      },
+      "link": "https://www.tenlong.com.tw/products/9786267146163",
+      "description": "深智出版,384 頁。天瓏繁體中文書銷售排行 2022/6 第 1 名、2022/7 第 2 名。"
+    },
+    {
+      "id": "book-002",
+      "district": "books",
+      "category": "book",
+      "title": "GitHub Copilot 讓你寫程式快 10 倍！AI 程式開發大解放",
+      "date": "2025-05-19",
+      "level": 2,
+      "metric": {
+        "天瓏最佳排名": 1
+      },
+      "link": "https://www.tenlong.com.tw/products/9786267569818",
+      "description": "深智出版,288 頁。天瓏繁體中文書銷售排行 2025/5、2025/6 皆第 1 名。"
+    },
+    {
+      "id": "book-003",
+      "district": "books",
+      "category": "book",
+      "title": "AI Agent 奇幻旅程：MCP 通往異世界金鑰（含最新 OpenAI GPT-5 範例）",
+      "date": "2025-08-29",
+      "level": 1,
+      "metric": {
+        "天瓏最佳排名": 2
+      },
+      "link": "https://www.tenlong.com.tw/products/9786264142922",
+      "description": "博碩出版,352 頁。天瓏繁體中文書銷售排行 2025/8、2025/9 皆第 2 名。"
     }
   ]
 }
